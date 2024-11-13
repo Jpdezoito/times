@@ -2,29 +2,7 @@
 <html>
 <head>
   <title>Login</title>
-  <style>
-    /* Estilos para o formulário */
-    body {
-      font-family: sans-serif;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 8px 15px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
 
@@ -48,7 +26,7 @@
       event.preventDefault();
 
       const apelido = document.getElementById('apelido').value;
-      const lembrar = document.getElementById('lembrar').checked;
+      // const lembrar = document.getElementById('lembrar').checked; // Removido a verificação
 
       // Carregar jogadores do Local Storage
       let jogadores = carregarJogadores();
@@ -58,9 +36,9 @@
 
       if (jogadorExistente) {
         // Jogador já cadastrado, fazer login
-        if (lembrar) {
+        // if (lembrar) { // Removido a verificação
           localStorage.setItem('jogadorLogado', JSON.stringify({ nome: jogadorExistente.nome, apelido }));
-        }
+        // }
         window.location.href = 'index.html';
       } else {
         alert('Jogador não encontrado. Por favor, cadastre-se.');

@@ -5,7 +5,7 @@ function carregarJogadores() {
 
 function carregarTimes() {
   let timesSalvos = localStorage.getItem("times");
-  return timesSalvos ? JSON.parse(timesSalvos) : { amarelo: [], azul: [] };
+  return timesSalvos ? JSON.parse(timesSalvos) : { amarelo: [], azul: [], ausentes: [] };
 }
 
 function salvarTimes() {
@@ -22,17 +22,34 @@ let times = carregarTimes();
 function marcarPresenca() {
   let nome = document.getElementById("nome-presenca").value;
   let status = document.getElementById("status-presenca").value;
+  let select = document.getElementById("nome-presenca");
+
+  // Remove o jogador de ambos os times e da lista de ausentes
+  times.amarelo = times.amarelo.filter(jogador => jogador !== nome);
+  times.azul = times.azul.filter(jogador => jogador !== nome);
+  times.ausentes = times.ausentes.filter(jogador => jogador !== nome);
 
   if (status === "presente") {
-    let timeDoJogador = times.amarelo.includes(nome) ? "amarelo" : "azul";
+    let timeDoJogador = times.amarelo.length <= times.azul.length ? "amarelo" : "azul";
     times[timeDoJogador].push(nome);
   } else {
-    times.amarelo = times.amarelo.filter(jogador => jogador !== nome);
-    times.azul = times.azul.filter(jogador => jogador !== nome);
+    times.ausentes.push(nome);
   }
 
   salvarTimes();
   atualizarListaJogadores();
+
+  // Atualiza a lista de jogadores no localStorage
+  jogadores = jogadores.filter(jogador => times.amarelo.includes(jogador.nome) || times.azul.includes(jogador.nome) || times.ausentes.includes(jogador.nome));
+  salvarJogadores();
+
+  // Desabilita a opção do jogador no dropdown
+  for (let i = 0; i < select.options.length; i++) {
+    if (select.options[i].value === nome) {
+      select.options[i].disabled = true;
+      break;
+    }
+  }
 }
 
 function separarJogadores() {
@@ -43,18 +60,21 @@ function separarJogadores() {
     ultimoDomingo.setDate(ultimoDomingo.getDate() - ultimoDomingo.getDay());
 
     if (hoje.getDate() === primeiroDomingo.getDate()) {
+      // Embaralha a lista de jogadores
       for (let i = jogadores.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [jogadores[i], jogadores[j]] = [jogadores[j], jogadores[i]];
       }
 
-      times = { amarelo: [], azul: [] };
+      // Reinicia os times
+      times = { amarelo: [], azul: [], ausentes: [] };
 
+      // Distribui os jogadores nos times
       for (let i = 0; i < jogadores.length; i++) {
         if (i % 2 === 0) {
-          times.amarelo.push(jogadores[i]);
+          times.amarelo.push(jogadores[i].nome);
         } else {
-          times.azul.push(jogadores[i]);
+          times.azul.push(jogadores[i].nome);
         }
       }
 
@@ -67,6 +87,11 @@ function separarJogadores() {
 function atualizarListaJogadores() {
   document.getElementById("lista-amarelo").innerHTML = "";
   document.getElementById("lista-azul").innerHTML = "";
+  document.getElementById("lista-ausentes").innerHTML = "";
+
+  if (!Array.isArray(times.ausentes)) {
+    times.ausentes = [];
+  }
 
   for (let jogador of times.amarelo) {
     let li = document.createElement("li");
@@ -78,6 +103,12 @@ function atualizarListaJogadores() {
     let li = document.createElement("li");
     li.textContent = jogador;
     document.getElementById("lista-azul").appendChild(li);
+  }
+
+  for (let jogador of times.ausentes) {
+    let li = document.createElement("li");
+    li.textContent = jogador;
+    document.getElementById("lista-ausentes").appendChild(li);
   }
 
   atualizarSelectsJogadores();
@@ -93,8 +124,22 @@ function atualizarSelectPresenca() {
   select.innerHTML = "";
   for (let jogador of jogadores) {
     let option = document.createElement("option");
-    option.value = jogador.nome; // Define o valor da opção como o nome do jogador
-    option.textContent = jogador.nome; // Exibe o nome do jogador na opção
+    option.value = jogador.nome;
+    option.textContent = jogador.nome;
+
+    // Verifica o status atual do jogador
+    let statusAtual = 
+        times.amarelo.includes(jogador.nome) ? 'presente' : 
+        times.azul.includes(jogador.nome) ? 'presente' : 
+        times.ausentes.includes(jogador.nome) ? 'ausente' : null;
+
+    // Desabilita a opção se ela corresponder ao status atual do jogador e ao status selecionado
+    if (statusAtual === 'presente' && document.getElementById('status-presenca').value === 'presente') {
+      option.disabled = true;
+    } else if (statusAtual === 'ausente' && document.getElementById('status-presenca').value === 'ausente') {
+      option.disabled = true;
+    }
+
     select.appendChild(option);
   }
 }
@@ -104,8 +149,8 @@ function atualizarSelectRemover() {
   select.innerHTML = "";
   for (let jogador of jogadores) {
     let option = document.createElement("option");
-    option.value = jogador.nome; // Define o valor da opção como o nome do jogador
-    option.textContent = jogador.nome; // Exibe o nome do jogador na opção
+    option.value = jogador.nome;
+    option.textContent = jogador.nome;
     select.appendChild(option);
   }
 }
@@ -113,14 +158,12 @@ function atualizarSelectRemover() {
 function removerJogador() {
   let select = document.getElementById("nome-remover");
   let nome = select.value;
-
-  // Remove o jogador da lista de jogadores
   jogadores = jogadores.filter(jogador => jogador.nome !== nome);
   salvarJogadores();
 
-  // Remove o jogador dos times
   times.amarelo = times.amarelo.filter(jogador => jogador !== nome);
   times.azul = times.azul.filter(jogador => jogador !== nome);
+  times.ausentes = times.ausentes.filter(jogador => jogador !== nome);
   salvarTimes();
 
   atualizarListaJogadores();
