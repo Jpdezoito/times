@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <style>
+    /* Estilos para o formulário */
+    body {
+      font-family: sans-serif;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 8px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Login</h2>
+
+  <form id="loginForm">
+    <label for="apelido">Apelido:</label>
+    <input type="text" id="apelido" name="apelido" required>
+
+    <input type="checkbox" id="lembrar" name="lembrar">
+    <label for="lembrar">Lembrar de mim</label><br><br>
+
+    <button type="submit">Entrar</button>
+  </form>
+
+  <p>Ainda não tem uma conta? <a href="cadastro.html">Cadastre-se aqui</a>.</p>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const apelido = document.getElementById('apelido').value;
+      const lembrar = document.getElementById('lembrar').checked;
+
+      // Carregar jogadores do Local Storage
+      let jogadores = carregarJogadores();
+
+      // Verificar se o jogador já existe
+      let jogadorExistente = jogadores.find(jogador => jogador.apelido === apelido);
+
+      if (jogadorExistente) {
+        // Jogador já cadastrado, fazer login
+        if (lembrar) {
+          localStorage.setItem('jogadorLogado', JSON.stringify({ nome: jogadorExistente.nome, apelido }));
+        }
+        window.location.href = 'index.html';
+      } else {
+        alert('Jogador não encontrado. Por favor, cadastre-se.');
+      }
+    });
+
+    function carregarJogadores() {
+      let jogadoresSalvos = localStorage.getItem("jogadores");
+      return jogadoresSalvos ? JSON.parse(jogadoresSalvos) : [];
+    }
+  </script>
+
+</body>
+</html>

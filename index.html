@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gerenciador de Times</title>
+</head>
+<body>
+  <h1>Gerenciador de Times</h1>
+
+  <div id="info-jogador">
+    </div>
+
+  <div id="times">
+    <h2>Time AMARELO</h2>
+    <ul id="lista-amarelo"></ul>
+
+    <h2>Time AZUL</h2>
+    <ul id="lista-azul"></ul>
+  </div>
+
+  <div id="controles">
+    <h2>Marcar Presença</h2>
+    <select id="nome-presenca"></select>
+    <select id="status-presenca">
+      <option value="presente">Presente</option>
+      <option value="ausente">Ausente</option>
+    </select>
+    <button onclick="marcarPresenca()">Marcar Presença</button>
+
+    <h2>Separar Jogadores</h2>
+    <button onclick="separarJogadores()">Separar Aleatoriamente</button>
+
+    <h2>Excluir Jogador</h2>
+    <select id="nome-remover"></select>
+    <button onclick="removerJogador()">Remover</button>
+
+    <h2>Sair</h2>
+    <button onclick="sair()">Sair</button>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Verificar se o jogador está logado
+    function verificarLogin() {
+      let jogadorLogado = localStorage.getItem('jogadorLogado');
+      if (jogadorLogado) {
+        jogadorLogado = JSON.parse(jogadorLogado);
+        exibirInfoJogador(jogadorLogado);
+      } else {
+        window.location.href = 'login.html';
+      }
+    }
+
+    function exibirInfoJogador(jogador) {
+      const infoJogadorDiv = document.getElementById('info-jogador');
+      infoJogadorDiv.innerHTML = `Bem-vindo, ${jogador.nome} (${jogador.apelido})!`;
+    }
+
+    // Chamar a função ao carregar a página
+    verificarLogin();
+  </script>
+</body>
+</html>
