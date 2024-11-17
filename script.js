@@ -1,23 +1,27 @@
-function carregarJogadores() {
-  let jogadoresSalvos = localStorage.getItem("jogadores");
-  return jogadoresSalvos ? JSON.parse(jogadoresSalvos) : [];
+let times = { amarelo: [], azul: [], ausentes: [] };
+let jogadores = [];
+
+// Função para buscar os jogadores na API
+function buscarJogadores() {
+  fetch('http://localhost:3000/jogadores')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erro ao buscar jogadores');
+      }
+      return response.json();
+    })
+    .then(data => {
+      jogadores = data;
+      atualizarListaJogadores();
+    })
+    .catch(error => {
+      console.error(error);
+      alert('Erro ao buscar jogadores');
+    });
 }
 
-function carregarTimes() {
-  let timesSalvos = localStorage.getItem("times");
-  return timesSalvos ? JSON.parse(timesSalvos) : { amarelo: [], azul: [], ausentes: [] };
-}
-
-function salvarTimes() {
-  localStorage.setItem("times", JSON.stringify(times));
-}
-
-function salvarJogadores() {
-  localStorage.setItem("jogadores", JSON.stringify(jogadores));
-}
-
-let jogadores = carregarJogadores();
-let times = carregarTimes();
+// Chama a função buscarJogadores ao carregar a página
+buscarJogadores();
 
 function marcarPresenca() {
   let nome = document.getElementById("nome-presenca").value;
@@ -36,12 +40,8 @@ function marcarPresenca() {
     times.ausentes.push(nome);
   }
 
-  salvarTimes();
+  // Atualiza a lista de jogadores após marcar a presença
   atualizarListaJogadores();
-
-  // Atualiza a lista de jogadores no localStorage
-  jogadores = jogadores.filter(jogador => times.amarelo.includes(jogador.nome) || times.azul.includes(jogador.nome) || times.ausentes.includes(jogador.nome));
-  salvarJogadores();
 
   // Desabilita a opção do jogador no dropdown
   for (let i = 0; i < select.options.length; i++) {
@@ -58,7 +58,6 @@ function separarJogadores() {
     let primeiroDomingo = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
     let ultimoDomingo = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
     ultimoDomingo.setDate(ultimoDomingo.getDate() - ultimoDomingo.getDay());
-
     if (hoje.getDate() === primeiroDomingo.getDate()) {
       // Embaralha a lista de jogadores
       for (let i = jogadores.length - 1; i > 0; i--) {
@@ -78,8 +77,28 @@ function separarJogadores() {
         }
       }
 
-      salvarTimes();
-      atualizarListaJogadores();
+      // Faz a requisição para a API para atualizar os times
+      fetch('http://localhost:3000/times', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(times)
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erro ao atualizar times');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Atualiza a lista de jogadores após a requisição
+          atualizarListaJogadores();
+        })
+        .catch(error => {
+          console.error(error);
+          alert('Erro ao atualizar times');
+        });
     }
   }
 }
@@ -93,22 +112,17 @@ function atualizarListaJogadores() {
     times.ausentes = [];
   }
 
-  for (let jogador of times.amarelo) {
+  for (let jogador of jogadores) {
     let li = document.createElement("li");
-    li.textContent = jogador;
-    document.getElementById("lista-amarelo").appendChild(li);
-  }
+    li.textContent = jogador.nome;
 
-  for (let jogador of times.azul) {
-    let li = document.createElement("li");
-    li.textContent = jogador;
-    document.getElementById("lista-azul").appendChild(li);
-  }
-
-  for (let jogador of times.ausentes) {
-    let li = document.createElement("li");
-    li.textContent = jogador;
-    document.getElementById("lista-ausentes").appendChild(li);
+    if (times.amarelo.includes(jogador.nome)) {
+      document.getElementById("lista-amarelo").appendChild(li);
+    } else if (times.azul.includes(jogador.nome)) {
+      document.getElementById("lista-azul").appendChild(li);
+    } else if (times.ausentes.includes(jogador.nome)) {
+      document.getElementById("lista-ausentes").appendChild(li);
+    }
   }
 
   atualizarSelectsJogadores();
@@ -127,18 +141,33 @@ function atualizarSelectPresenca() {
     option.value = jogador.nome;
     option.textContent = jogador.nome;
 
-    // Verifica o status atual do jogador
-    let statusAtual = 
-        times.amarelo.includes(jogador.nome) ? 'presente' : 
-        times.azul.includes(jogador.nome) ? 'presente' : 
-        times.ausentes.includes(jogador.nome) ? 'ausente' : null;
+    // Verifica o status atual do jogador (requisição para a API)
+    fetch(`http://localhost:3000/jogadores/${jogador.apelido}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erro ao buscar jogador');
+        }
+        return response.json();
+      })
+      .then(jogador => {
+        let statusAtual =
+          times.amarelo.includes(jogador.nome) ?
+            'presente' :
+            times.azul.includes(jogador.nome) ?
+              'presente' :
+              times.ausentes.includes(jogador.nome) ? 'ausente' : null;
 
-    // Desabilita a opção se ela corresponder ao status atual do jogador e ao status selecionado
-    if (statusAtual === 'presente' && document.getElementById('status-presenca').value === 'presente') {
-      option.disabled = true;
-    } else if (statusAtual === 'ausente' && document.getElementById('status-presenca').value === 'ausente') {
-      option.disabled = true;
-    }
+        // Desabilita a opção se ela corresponder ao status atual do jogador e ao status selecionado
+        if (statusAtual === 'presente' && document.getElementById('status-presenca').value === 'presente') {
+          option.disabled = true;
+        } else if (statusAtual === 'ausente' && document.getElementById('status-presenca').value === 'ausente') {
+          option.disabled = true;
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        alert('Erro ao buscar jogador');
+      });
 
     select.appendChild(option);
   }
@@ -158,19 +187,28 @@ function atualizarSelectRemover() {
 function removerJogador() {
   let select = document.getElementById("nome-remover");
   let nome = select.value;
-  jogadores = jogadores.filter(jogador => jogador.nome !== nome);
-  salvarJogadores();
 
-  times.amarelo = times.amarelo.filter(jogador => jogador !== nome);
-  times.azul = times.azul.filter(jogador => jogador !== nome);
-  times.ausentes = times.ausentes.filter(jogador => jogador !== nome);
-  salvarTimes();
-
-  atualizarListaJogadores();
+  // Faz a requisição para a API para remover o jogador
+  fetch(`http://localhost:3000/jogadores/${nome}`, {
+    method: 'DELETE'
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erro ao remover jogador');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Atualiza a lista de jogadores após a requisição
+      atualizarListaJogadores();
+    })
+    .catch(error => {
+      console.error(error);
+      alert('Erro ao remover jogador');
+    });
 }
 
 function sair() {
-  localStorage.removeItem('jogadorLogado');
   window.location.href = 'login.html';
 }
 

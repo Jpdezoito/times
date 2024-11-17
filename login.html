@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Login</title>
-  <link rel="stylesheet" href="style.css"> 
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -12,43 +12,43 @@
     <label for="apelido">Apelido:</label>
     <input type="text" id="apelido" name="apelido" required>
 
-    <input type="checkbox" id="lembrar" name="lembrar">
-    <label for="lembrar">Lembrar de mim</label><br><br>
-
     <button type="submit">Entrar</button>
   </form>
 
-  <p>Ainda não tem uma conta? <a href="cadastro.html">Cadastre-se aqui</a>.</p>
+  <p>Ainda não tem uma conta?
+    <a href="cadastro.html">Cadastre-se aqui</a>.</p>
 
   <script>
+    // Código para fazer a requisição para a API
     const form = document.getElementById('loginForm');
+
     form.addEventListener('submit', (event) => {
       event.preventDefault();
 
       const apelido = document.getElementById('apelido').value;
-      // const lembrar = document.getElementById('lembrar').checked; // Removido a verificação
 
-      // Carregar jogadores do Local Storage
-      let jogadores = carregarJogadores();
-
-      // Verificar se o jogador já existe
-      let jogadorExistente = jogadores.find(jogador => jogador.apelido === apelido);
-
-      if (jogadorExistente) {
-        // Jogador já cadastrado, fazer login
-        // if (lembrar) { // Removido a verificação
-          localStorage.setItem('jogadorLogado', JSON.stringify({ nome: jogadorExistente.nome, apelido }));
-        // }
-        window.location.href = 'index.html';
-      } else {
-        alert('Jogador não encontrado. Por favor, cadastre-se.');
-      }
+      // Faz a requisição GET para a API
+      fetch(`http://localhost:3000/jogadores/${apelido}`)
+        .then(response => {
+          if (!response.ok) {
+            if (response.status === 404) {
+              // Jogador não encontrado
+              alert('Jogador não encontrado. Por favor, cadastre-se.');
+            } else {
+              throw new Error('Erro ao buscar jogador');
+            }
+          }
+          return response.json();
+        })
+        .then(jogador => {
+          // Redireciona para a página index.html
+          window.location.href = 'index.html';
+        })
+        .catch(error => {
+          console.error(error);
+          alert('Erro ao buscar jogador');
+        });
     });
-
-    function carregarJogadores() {
-      let jogadoresSalvos = localStorage.getItem("jogadores");
-      return jogadoresSalvos ? JSON.parse(jogadoresSalvos) : [];
-    }
   </script>
 
 </body>

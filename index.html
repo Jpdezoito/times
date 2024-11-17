@@ -1,107 +1,14 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Gerenciador de Times</title>
-  <style>
-    /* Estilos CSS */
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 20px;
-    }
-
-    h1, h2 {
-      text-align: center;
-    }
-
-    #times {
-      display: flex; /* Organiza os times lado a lado */
-      justify-content: space-around; /* Distribui espaço entre os times */
-    }
-
-    #times > div {
-      width: 30%; /* Define a largura de cada time */
-    }
-
-    #controles {
-      display: flex; /* Organiza os controles lado a lado */
-      flex-direction: column; /* Organiza os controles em colunas */
-      align-items: center; /* Alinha os controles ao centro */
-      margin-top: 20px;
-    }
-
-    #controles > div {
-      width: 50%; /* Define a largura de cada controle */
-      margin-bottom: 10px;
-    }
-
-    form {
-      max-width: 400px;
-      margin: 20px auto;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    input[type="text"],
-    select {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-      box-sizing: border-box;
-    }
-
-    button {
-      padding: 8px 15px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 3px;
-    }
-
-    /* Estilos para telas menores (até 768px de largura) */
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 24px;
-      }
-
-      h2 {
-        font-size: 18px;
-      }
-
-      #times {
-        flex-direction: column;
-      }
-
-      #times > div {
-        width: 100%;
-        margin-bottom: 20px;
-      }
-
-      #controles {
-        flex-direction: column;
-      }
-
-      #controles > div {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
+
+<body onload="atualizarListaJogadores()">
 
   <h1>Gerenciador de Times</h1>
-
-  <div id="info-jogador"></div>
 
   <div id="times">
     <h2>Time AMARELO</h2>
@@ -135,26 +42,6 @@
   </div>
 
   <script src="script.js"></script>
-  <script>
-    // Verificar se o jogador está logado
-    function verificarLogin() {
-      let jogadorLogado = localStorage.getItem('jogadorLogado');
-      if (jogadorLogado) {
-        jogadorLogado = JSON.parse(jogadorLogado);
-        exibirInfoJogador(jogadorLogado);
-      } else {
-        window.location.href = 'login.html';
-      }
-    }
-
-    function exibirInfoJogador(jogador) {
-      const infoJogadorDiv = document.getElementById('info-jogador');
-      infoJogadorDiv.innerHTML = `Bem-vindo, ${jogador.nome} (${jogador.apelido})!`;
-    }
-
-    // Chamar a função ao carregar a página
-    verificarLogin();
-  </script>
-
 </body>
+
 </html>

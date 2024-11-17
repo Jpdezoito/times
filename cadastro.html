@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
   <title>Cadastro de Jogador</title>
   <style>
     /* Estilos para o formulário */
@@ -40,46 +40,43 @@
 
     <button type="submit">Cadastrar</button>
   </form>
+  <p>Já possui cadastro? <a href="login.html">Faça login aqui</a>.</p>
 
   <script>
+    // Código para enviar os dados do formulário para a API
     const form = document.getElementById('cadastroForm');
+
     form.addEventListener('submit', (event) => {
-      event.preventDefault();
+      event.preventDefault(); // Impede o envio padrão do formulário
 
       const nome = document.getElementById('nome').value;
       const apelido = document.getElementById('apelido').value;
 
-      // Carregar jogadores do Local Storage
-      let jogadores = carregarJogadores();
-
-      // Verificar se já existe um jogador com o mesmo nome e apelido
-      let jogadorExistente = jogadores.find(jogador => jogador.nome === nome && jogador.apelido === apelido);
-
-      if (jogadorExistente) {
-        alert('Já existe um jogador com esse nome e apelido. Por favor, escolha outro apelido.');
-      } else {
-        // Adicionar o novo jogador à lista
-        jogadores.push({ nome, apelido });
-
-        // Salvar a lista atualizada no Local Storage
-        salvarJogadores(jogadores);
-
-        alert('Jogador cadastrado com sucesso!');
-        form.reset();
-
-        // Redirecionar para a página de login
-        window.location.href = 'login.html';
-      }
+      // Faz a requisição POST para a API
+      fetch('http://localhost:3000/jogadores', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ nome, apelido })
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erro ao cadastrar jogador'); // Trata erros da API
+          }
+          return response.json(); // Converte a resposta para JSON
+        })
+        .then(data => {
+          // Exibe mensagem de sucesso e redireciona para o login
+          alert(data.mensagem);
+          form.reset(); // Limpa o formulário
+          window.location.href = 'login.html';
+        })
+        .catch(error => {
+          console.error(error);
+          alert('Erro ao cadastrar jogador'); // Exibe mensagem de erro
+        });
     });
-
-    function carregarJogadores() {
-      let jogadoresSalvos = localStorage.getItem("jogadores");
-      return jogadoresSalvos ? JSON.parse(jogadoresSalvos) : [];
-    }
-
-    function salvarJogadores(jogadores) {
-      localStorage.setItem("jogadores", JSON.stringify(jogadores));
-    }
   </script>
 
 </body>
