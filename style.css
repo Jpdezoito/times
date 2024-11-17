@@ -1,71 +1,104 @@
-/* Estilos gerais para todas as páginas */
+/* Estilos gerais */
 body {
-    font-family: sans-serif;
-    margin: 0;
-    padding: 20px;
+  font-family: sans-serif;
+  background-color: #f2f2f2; /* Cor de fundo que lembra um campo de futebol */
+  margin: 0;
+  padding: 20px;
+}
+
+h1, h2 {
+  text-align: center;
+  color: #333; /* Cor escura para o texto */
+}
+
+/* Estilos para os times */
+#times {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.time {
+  width: 30%;
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidade */
+  text-align: center;
+}
+
+/* Imagens dos times */
+.time-imagem {
+  width: 100px;
+  height: 100px;
+  object-fit: contain; /* Ajusta a imagem ao contêiner */
+  margin: 0 auto 20px; /* Centraliza a imagem */
+  border-radius: 50%; /* Deixa a imagem circular */
+  overflow: hidden; /* Esconde as partes da imagem que excedem o círculo */
+}
+
+/* Listas de jogadores */
+.time ul {
+  list-style: none;
+  padding: 0;
+}
+
+.time li {
+  padding: 5px;
+  border-bottom: 1px solid #eee; /* Linha separando os jogadores */
+}
+
+/* Controles */
+#controles {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40px;
+}
+
+#controles div {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Formulários */
+form {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  max-width: 400px;
+}
+
+label {
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+button {
+  background-color: #007bff; /* Cor azul para os botões */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  #times {
+    flex-direction: column;
+    align-items: center;
   }
-  
-  h1, h2 {
-    text-align: center;
+
+  .time {
+    width: 80%;
+    margin-bottom: 20px;
   }
-  
-  form {
-    max-width: 400px;
-    margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 5px;
-  }
-  
-  input[type="text"],
-  select {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    box-sizing: border-box;
-  }
-  
-  button {
-    padding: 8px 15px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 3px;
-  }
-  
-  /* Estilos para telas menores (até 768px de largura) */
-  @media (max-width: 768px) {
-    h1 {
-      font-size: 24px;
-    }
-  
-    h2 {
-      font-size: 18px;
-    }
-  
-    #times {
-      flex-direction: column;
-    }
-  
-    #times > div {
-      width: 100%;
-      margin-bottom: 20px;
-    }
-  
-    #controles {
-      flex-direction: column;
-    }
-  
-    #controles > div {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-  }
+}
