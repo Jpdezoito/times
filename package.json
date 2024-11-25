@@ -1,4 +1,11 @@
 {
+  "name": "times",
+  "version": "1.0.0",
+  "description": "Servidor para salvar informações",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.1"
